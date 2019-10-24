@@ -24,7 +24,8 @@ namespace ProductApi
         {
             services.AddDbContext<ProductContext>(opt =>
             {
-                opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
+                opt.UseInMemoryDatabase("ProductItems");
+                //(Configuration.GetConnectionString("DefaultConnection"));
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
