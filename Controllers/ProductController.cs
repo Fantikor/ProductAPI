@@ -19,10 +19,13 @@ namespace ProductApi.Controllers
         {
             this.logger = logger;
             this.context = context;
+
+            context.Database.OpenConnection();
+            context.Database.EnsureCreated();
         }
 
         // GET
-        // api/Product/ProductItem
+        // api/product/
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductItem>>> GetProductItemsAsync()
         {
@@ -33,12 +36,13 @@ namespace ProductApi.Controllers
 
         // GET
         // api/product/guid
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ProductItem>> GetProductItemAsync(Guid guid)
+        [Route("{id:guid}")]
+        [HttpGet]
+        public async Task<ActionResult<ProductItem>> GetProductItemAsync(Guid id)
         {
             logger?.LogDebug("'{0}' has been invoked", nameof(GetProductItemAsync));
 
-            var productItem = await context.GetProductItemsAsync(new ProductItem(guid));
+            var productItem = await context.GetProductItemsAsync(new ProductItem(id));
 
             if(productItem == null)
             {
@@ -49,7 +53,7 @@ namespace ProductApi.Controllers
         }
 
         // POST
-        // api/product
+        // api/product/
         [HttpPost]
         public async Task<ActionResult<ProductItem>> PostProductItemAsync([FromBody] ProductCreateInputModel model)
         {
@@ -68,7 +72,7 @@ namespace ProductApi.Controllers
         }
 
         // PUT
-        // api/product
+        // api/product/
         [HttpPut]
         public async Task<IActionResult> PutProductItemAsync([FromBody]ProductUpdateInputModel model)
         {
@@ -91,7 +95,8 @@ namespace ProductApi.Controllers
 
         // DELETE
         // api/product/guid
-        [HttpDelete("{id}")]
+        [Route("{id:guid}")]
+        [HttpDelete]
         public async Task<IActionResult> DeleteTodoItem(Guid id)
         {
             logger?.LogDebug("'{0}' has been invoked with guid {1}", nameof(PostProductItemAsync), id);

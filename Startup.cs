@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ProductApi.Models;
 using ProductApi.Controllers;
 using Microsoft.Extensions.Logging;
+using Microsoft.Data.Sqlite;
 
 namespace ProductApi
 {
@@ -22,11 +23,20 @@ namespace ProductApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ProductContext>(opt =>
+            // Set up Sqlite DB
+            var builder = new SqliteConnectionStringBuilder()
             {
-                opt.UseInMemoryDatabase("ProductItems");
-                //(Configuration.GetConnectionString("DefaultConnection"));
-            });
+                DataSource = "Products.db",
+                Mode = SqliteOpenMode.ReadWriteCreate,
+                Cache = SqliteCacheMode.Default,
+            };
+
+            var connection = new SqliteConnection(builder.ConnectionString);
+            connection.Open();
+            connection.EnableExtensions(true);
+
+            services.AddDbContext<ProductContext>(opt => opt.UseSqlite(connection));
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // Set up dependency injection for controller's logger
